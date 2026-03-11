@@ -1,0 +1,118 @@
+.employee-list {
+  font-family: 'Outfit', sans-serif;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+
+  h1 { font-size: 1.8rem; font-weight: 700; color: #0f172a; margin: 0 0 0.25rem; }
+  p  { color: #64748b; margin: 0; font-size: 0.9rem; }
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0 1rem;
+  flex: 1;
+  max-width: 420px;
+  height: 40px;
+
+  i { color: #94a3b8; font-size: 0.9rem; }
+
+  input {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.875rem;
+    color: #374151;
+    background: transparent;
+
+    &::placeholder { color: #cbd5e1; }
+  }
+}
+
+::ng-deep .dept-select {
+  min-width: 180px;
+  border-radius: 10px !important;
+}
+
+.table-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+}
+
+.row-num { color: #94a3b8; font-size: 0.8rem; }
+
+.emp-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.emp-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.email-cell { color: #64748b; font-size: 0.85rem; }
+
+.dept-chip {
+  background: #eff6ff;
+  color: #2563eb;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.salary-cell { font-weight: 600; color: #1e293b; }
+
+.cl-chip {
+  background: #f0fdf4;
+  color: #16a34a;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.action-group {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.empty-cell {
+  text-align: center;
+  padding: 3rem;
+  color: #94a3b8;
+
+  i { font-size: 2.5rem; display: block; margin-bottom: 0.75rem; }
+  p { margin: 0; }
+}

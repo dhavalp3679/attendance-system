@@ -1,0 +1,128 @@
+<p-toast></p-toast>
+
+<div class="employee-form">
+
+  <div class="page-header">
+    <div>
+      <h1>{{ isEdit ? 'Edit Employee' : 'Add New Employee' }}</h1>
+      <p>{{ isEdit ? 'Update employee information' : 'Fill in new employee details' }}</p>
+    </div>
+    <button pButton label="Back to List" icon="pi pi-arrow-left"
+            severity="secondary" (click)="cancel()"></button>
+  </div>
+
+  <div class="form-card">
+
+    <!-- Section 1: Basic Info -->
+    <div class="section-title">
+      <span class="section-num">1</span>
+      <h3>Basic Information</h3>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <label>Full Name <span class="req">*</span></label>
+        <input pInputText [(ngModel)]="form.name" placeholder="Bharti Patel" />
+      </div>
+      <div class="field">
+        <label>Email Address <span class="req">*</span></label>
+        <input pInputText [(ngModel)]="form.email" type="email" placeholder="bharti@company.com" />
+      </div>
+      @if (!isEdit) {
+        <div class="field">
+          <label>Password <span class="req">*</span></label>
+          <input pInputText [(ngModel)]="form.password" type="password" placeholder="Min 6 chars" />
+        </div>
+      }
+      <div class="field">
+        <label>Phone Number</label>
+        <input pInputText [(ngModel)]="form.phoneNumber" placeholder="9876543210" />
+      </div>
+      <div class="field">
+        <label>Join Date</label>
+        <input pInputText [(ngModel)]="form.joinDate" type="date" />
+      </div>
+    </div>
+
+    <p-divider></p-divider>
+
+    <!-- Section 2: Job Info -->
+    <div class="section-title">
+      <span class="section-num">2</span>
+      <h3>Job Information</h3>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <label>Department <span class="req">*</span></label>
+        <p-select [(ngModel)]="form.department" [options]="departments" placeholder="Select Department"></p-select>
+      </div>
+      <div class="field">
+        <label>Designation <span class="req">*</span></label>
+        <input pInputText [(ngModel)]="form.designation" placeholder="Developer, Manager..." />
+      </div>
+      <div class="field">
+        <label>Gross Salary (₹) <span class="req">*</span></label>
+        <input pInputText [(ngModel)]="form.salary" type="number" placeholder="30000" />
+      </div>
+      <div class="field">
+        <label>Role <span class="req">*</span></label>
+        <p-select [(ngModel)]="form.role" [options]="roles" placeholder="Select Role"></p-select>
+      </div>
+    </div>
+
+    <p-divider></p-divider>
+
+    <!-- Section 3: Bank Details -->
+    <div class="section-title">
+      <span class="section-num">3</span>
+      <h3>Bank Details</h3>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <label>Account Number</label>
+        <input pInputText [(ngModel)]="form.bankAccountNumber" placeholder="1234567890" />
+      </div>
+      <div class="field">
+        <label>IFSC Code</label>
+        <input pInputText [(ngModel)]="form.bankIfscCode" placeholder="SBIN0001234" />
+      </div>
+      <div class="field">
+        <label>Bank Name</label>
+        <input pInputText [(ngModel)]="form.bankName" placeholder="State Bank of India" />
+      </div>
+    </div>
+
+    <p-divider></p-divider>
+
+    <!-- Section 4: Emergency & Address -->
+    <div class="section-title">
+      <span class="section-num">4</span>
+      <h3>Emergency Contact & Address</h3>
+    </div>
+    <div class="form-grid">
+      <div class="field">
+        <label>Address</label>
+        <input pInputText [(ngModel)]="form.address" placeholder="Ahmedabad, Gujarat" />
+      </div>
+      <div class="field">
+        <label>Emergency Contact Name</label>
+        <input pInputText [(ngModel)]="form.emergencyContactName" placeholder="Ramesh Patel" />
+      </div>
+      <div class="field">
+        <label>Emergency Contact Phone</label>
+        <input pInputText [(ngModel)]="form.emergencyContactPhone" placeholder="9898989898" />
+      </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="form-actions">
+      <button pButton label="Cancel" severity="secondary" icon="pi pi-times" (click)="cancel()"></button>
+      <button pButton
+              [label]="isEdit ? 'Update Employee' : 'Add Employee'"
+              [icon]="isEdit ? 'pi pi-check' : 'pi pi-plus'"
+              (click)="save()"
+              [loading]="loading">
+      </button>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,21 @@
+.holidays { font-family: 'Outfit', sans-serif; }
+.page-header {
+  display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;
+  h1 { font-size: 1.8rem; font-weight: 700; color: #0f172a; margin: 0 0 0.25rem; }
+  p  { color: #64748b; margin: 0; }
+}
+.section-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 8px rgba(0,0,0,0.05); }
+.day-cell { color: #64748b; font-size: 0.875rem; }
+.holiday-name { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: #1e293b;
+  .star { color: #f59e0b; } }
+.desc-cell { color: #94a3b8; font-size: 0.85rem; }
+.empty-cell { text-align: center; color: #94a3b8; padding: 2rem; font-style: italic; }
+.dialog-form { display: flex; flex-direction: column; gap: 1rem; padding: 0.5rem 0; }
+.field { display: flex; flex-direction: column; gap: 0.4rem;
+  label { font-size: 0.85rem; font-weight: 600; color: #374151; } }
+.date-input {
+  width: 100%; height: 40px; padding: 0 0.75rem;
+  border: 1px solid #e2e8f0; border-radius: 8px;
+  font-family: 'Outfit', sans-serif; font-size: 0.875rem;
+  &:focus { outline: none; border-color: #2563eb; }
+}

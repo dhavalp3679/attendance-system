@@ -1,0 +1,247 @@
+.dashboard {
+  font-family: 'Outfit', sans-serif;
+}
+
+// ── Header ───────────────────────────────────────────────
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.3rem;
+  }
+
+  p {
+    color: #64748b;
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}
+
+.date-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.55rem 1.1rem;
+  color: #475569;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+// ── Stats Grid ───────────────────────────────────────────
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+  border-left: 4px solid;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  }
+
+  &.blue  { border-color: #2563eb; .stat-icon { background: #eff6ff; color: #2563eb; } }
+  &.green { border-color: #16a34a; .stat-icon { background: #f0fdf4; color: #16a34a; } }
+  &.amber { border-color: #d97706; .stat-icon { background: #fffbeb; color: #d97706; } }
+  &.red   { border-color: #dc2626; .stat-icon { background: #fef2f2; color: #dc2626; } }
+}
+
+.stat-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  i {
+    font-size: 1.5rem;
+  }
+}
+
+.stat-body {
+  display: flex;
+  flex-direction: column;
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-top: 0.3rem;
+    font-weight: 500;
+  }
+}
+
+// ── Card ─────────────────────────────────────────────────
+.card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+
+    h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+
+  .view-all {
+    font-size: 0.8rem;
+    color: #2563eb;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-weight: 500;
+
+    &:hover { text-decoration: underline; }
+  }
+}
+
+.empty-cell {
+  text-align: center;
+  color: #94a3b8;
+  padding: 2.5rem;
+  font-style: italic;
+}
+
+// ── Employee Dashboard ───────────────────────────────────
+.employee-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.my-status-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 1.5rem;
+  }
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  .label {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-weight: 600;
+  }
+
+  strong {
+    font-size: 0.95rem;
+    color: #1e293b;
+  }
+}
+
+.no-punch {
+  text-align: center;
+  padding: 2rem;
+  color: #f59e0b;
+
+  i {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  p {
+    color: #64748b;
+    margin-bottom: 1rem;
+  }
+}
+
+.quick-links {
+  background: white;
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 1.25rem;
+  }
+}
+
+.links-grid {
+  display: flex;
+  gap: 1rem;
+}
+
+.quick-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem 2rem;
+  border-radius: 14px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+
+  i { font-size: 1.5rem; }
+
+  &.blue  { background: #eff6ff; color: #2563eb; &:hover { background: #dbeafe; } }
+  &.green { background: #f0fdf4; color: #16a34a; &:hover { background: #dcfce7; } }
+  &.purple { background: #faf5ff; color: #7c3aed; &:hover { background: #ede9fe; } }
+}

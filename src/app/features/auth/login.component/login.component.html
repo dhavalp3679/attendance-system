@@ -1,0 +1,87 @@
+<p-toast></p-toast>
+
+<div class="login-page">
+  <!-- Left Panel -->
+  <div class="login-left">
+    <div class="brand">
+      <i class="pi pi-building"></i>
+      <h1>AttendancePro</h1>
+    </div>
+    <p class="tagline">Smart Attendance & Salary Management</p>
+    <div class="features">
+      <div class="feature-item">
+        <i class="pi pi-check-circle"></i>
+        <span>Employee Management</span>
+      </div>
+      <div class="feature-item">
+        <i class="pi pi-check-circle"></i>
+        <span>Real-time Attendance Tracking</span>
+      </div>
+      <div class="feature-item">
+        <i class="pi pi-check-circle"></i>
+        <span>Leave & Holiday Management</span>
+      </div>
+      <div class="feature-item">
+        <i class="pi pi-check-circle"></i>
+        <span>Salary with PF, ESIC & Tax</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="login-right">
+    <div class="login-card">
+      <div class="card-header">
+        <h2>Welcome Back</h2>
+        <p>Sign in to your account</p>
+      </div>
+
+      <div class="error-box" *ngIf="errorMessage">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <div class="form-field">
+        <label for="email">Email Address</label>
+        <span class="p-input-icon-left">
+          <i class="pi pi-envelope"></i>
+          <input
+            pInputText
+            id="email"
+            type="email"
+            [(ngModel)]="loginData.email"
+            placeholder="dhaval@company.com"
+            (keyup.enter)="login()"
+          />
+        </span>
+      </div>
+
+      <div class="form-field">
+        <label for="password">Password</label>
+        <p-password
+          id="password"
+          [(ngModel)]="loginData.password"
+          [feedback]="false"
+          [toggleMask]="true"
+          placeholder="Enter your password"
+          styleClass="w-full"
+          inputStyleClass="w-full"
+          (keyup.enter)="login()"
+        ></p-password>
+      </div>
+
+      <p-button
+        label="Sign In"
+        icon="pi pi-sign-in"
+        styleClass="login-btn"
+        [loading]="loading"
+        (onClick)="login()"
+      ></p-button>
+
+      <div class="hint-box">
+        <i class="pi pi-info-circle"></i>
+        <span>Admin: dhaval&#64;company.com &nbsp;|&nbsp; Password: test123</span>
+      </div>
+    </div>
+  </div>
+</div>

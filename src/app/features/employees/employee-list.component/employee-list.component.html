@@ -1,0 +1,102 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="employee-list">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1>Employees</h1>
+      <p>Manage all company employees ({{ filteredEmployees.length }} records)</p>
+    </div>
+    <button pButton label="Add Employee" icon="pi pi-plus" (click)="goToAdd()"></button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <div class="search-box">
+      <i class="pi pi-search"></i>
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        placeholder="Search by name, email, designation..."
+      />
+    </div>
+    <p-select
+      [(ngModel)]="selectedDept"
+      [options]="departments"
+      placeholder="All Departments"
+      styleClass="dept-select"
+    ></p-select>
+    <button pButton label="Refresh" icon="pi pi-refresh" severity="secondary" (click)="load()"></button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-card">
+    <p-table
+      [value]="filteredEmployees"
+      [loading]="loading"
+      styleClass="p-datatable-sm p-datatable-striped"
+      [paginator]="true"
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="{first} - {last} of {totalRecords}"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>#</th>
+          <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
+          <th>Email</th>
+          <th pSortableColumn="department">Department <p-sortIcon field="department"></p-sortIcon></th>
+          <th>Designation</th>
+          <th pSortableColumn="salary">Salary <p-sortIcon field="salary"></p-sortIcon></th>
+          <th>Role</th>
+          <th>CL Balance</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-emp let-i="rowIndex">
+        <tr>
+          <td class="row-num">{{ i + 1 }}</td>
+          <td>
+            <div class="emp-name-cell">
+              <div class="emp-avatar">{{ emp.name[0] }}</div>
+              <span>{{ emp.name }}</span>
+            </div>
+          </td>
+          <td class="email-cell">{{ emp.email }}</td>
+          <td>
+            <span class="dept-chip">{{ emp.department }}</span>
+          </td>
+          <td>{{ emp.designation }}</td>
+          <td class="salary-cell">₹{{ emp.salary | number }}</td>
+          <td>
+            <p-tag [value]="emp.role" [severity]="getRoleSeverity(emp.role)"></p-tag>
+          </td>
+          <td>
+            <span class="cl-chip">{{ emp.clBalance ?? 12 }} days</span>
+          </td>
+          <td>
+            <div class="action-group">
+              <button pButton icon="pi pi-pencil" severity="secondary" size="small"
+                      pTooltip="Edit" (click)="goToEdit(emp.id!)"></button>
+              <button pButton icon="pi pi-trash" severity="danger" size="small"
+                      pTooltip="Delete" (click)="confirmDelete(emp)"></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="9" class="empty-cell">
+            <i class="pi pi-users"></i>
+            <p>Koi employee nathi</p>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+</div>

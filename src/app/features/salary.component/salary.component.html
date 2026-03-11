@@ -1,0 +1,205 @@
+<p-toast></p-toast>
+
+<div class="salary">
+
+  <div class="page-header">
+    <div>
+      <h1>Salary</h1>
+      <p>{{ auth.isAdmin() ? 'Calculate and manage employee salaries' : 'Your salary reports' }}</p>
+    </div>
+  </div>
+
+  <!-- ── ADMIN: Calculate ──────────────────────────────── -->
+  @if (auth.isAdmin()) {
+    <div class="calc-card">
+      <h3><i class="pi pi-calculator"></i> Calculate Salary</h3>
+      <div class="calc-form">
+        <div class="field">
+          <label>Employee ID</label>
+          <input type="number" [(ngModel)]="calcReq.employeeId" placeholder="1" class="form-input" min="1" />
+        </div>
+        <div class="field">
+          <label>Month</label>
+          <input type="month" [(ngModel)]="calcReq.month" class="form-input" />
+        </div>
+        <div class="field field-btn">
+          <label>&nbsp;</label>
+          <button pButton label="Calculate" icon="pi pi-calculator"
+                  (click)="calculate()" [loading]="calcLoading"></button>
+        </div>
+      </div>
+
+      <!-- Salary Breakdown Result -->
+      @if (salaryResult) {
+        <div class="result-box">
+          <div class="result-top">
+            <div class="result-name">
+              <h4>{{ salaryResult.employeeName }}</h4>
+              <span>{{ salaryResult.month }}</span>
+            </div>
+            <div class="net-badge">
+              <span>NET SALARY</span>
+              <strong>₹{{ salaryResult.netSalary | number:'1.0-0' }}</strong>
+            </div>
+          </div>
+
+          <p-divider></p-divider>
+
+          <div class="breakdown-grid">
+            <!-- Earnings -->
+            <div class="breakdown-col">
+              <div class="col-title earnings">💰 Earnings</div>
+              <div class="breakdown-row">
+                <span>Gross Salary</span>
+                <strong>₹{{ salaryResult.grossSalary | number }}</strong>
+              </div>
+              <div class="breakdown-row">
+                <span>Basic (50%)</span>
+                <strong>₹{{ salaryResult.basicSalary | number }}</strong>
+              </div>
+              @if ((salaryResult.overtimePay || 0) > 0) {
+                <div class="breakdown-row plus">
+                  <span>Overtime Pay</span>
+                  <strong>+₹{{ salaryResult.overtimePay | number }}</strong>
+                </div>
+              }
+            </div>
+
+            <!-- Deductions -->
+            <div class="breakdown-col">
+              <div class="col-title deductions">📉 Deductions</div>
+              <div class="breakdown-row minus">
+                <span>PF (25% of Basic)</span>
+                <strong>-₹{{ salaryResult.pfDeduction | number }}</strong>
+              </div>
+              <div class="breakdown-row minus">
+                <span>ESIC (4% of Basic)</span>
+                <strong>-₹{{ salaryResult.esicDeduction | number }}</strong>
+              </div>
+              <div class="breakdown-row minus">
+                <span>Professional Tax</span>
+                <strong>-₹{{ salaryResult.professionalTax | number }}</strong>
+              </div>
+              @if ((salaryResult.absentDeduction || 0) > 0) {
+                <div class="breakdown-row minus">
+                  <span>Absent/LWP Cut</span>
+                  <strong>-₹{{ salaryResult.absentDeduction | number }}</strong>
+                </div>
+              }
+              @if ((salaryResult.lateDeduction || 0) > 0) {
+                <div class="breakdown-row minus">
+                  <span>Late Cut</span>
+                  <strong>-₹{{ salaryResult.lateDeduction | number }}</strong>
+                </div>
+              }
+            </div>
+
+            <!-- Attendance Info -->
+            <div class="breakdown-col">
+              <div class="col-title info">📋 Attendance</div>
+              <div class="breakdown-row">
+                <span>Working Days</span>
+                <strong>{{ salaryResult.workingDays }}</strong>
+              </div>
+              <div class="breakdown-row plus">
+                <span>Present Days</span>
+                <strong>{{ salaryResult.presentDays }}</strong>
+              </div>
+              <div class="breakdown-row minus">
+                <span>Absent Days</span>
+                <strong>{{ salaryResult.absentDays }}</strong>
+              </div>
+              <div class="breakdown-row">
+                <span>Late Count</span>
+                <strong>{{ salaryResult.lateCount }}</strong>
+              </div>
+              <div class="breakdown-row plus">
+                <span>Overtime</span>
+                <strong>{{ salaryResult.overtimeHours | number:'1.1-1' }} hrs</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Net Summary -->
+          <div class="net-summary">
+            <div class="summary-item">
+              <span>Gross</span>
+              <strong>₹{{ salaryResult.grossSalary | number }}</strong>
+            </div>
+            <div class="summary-minus">—</div>
+            <div class="summary-item">
+              <span>Deductions</span>
+              <strong class="red">₹{{ totalDeductions | number }}</strong>
+            </div>
+            <div class="summary-plus">+</div>
+            <div class="summary-item">
+              <span>Overtime</span>
+              <strong class="green">₹{{ salaryResult.overtimePay | number }}</strong>
+            </div>
+            <div class="summary-eq">=</div>
+            <div class="summary-item net">
+              <span>Net Salary</span>
+              <strong>₹{{ salaryResult.netSalary | number:'1.0-0' }}</strong>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- View Report -->
+    <div class="view-card">
+      <h3><i class="pi pi-search"></i> View Existing Report</h3>
+      <div class="calc-form">
+        <div class="field">
+          <label>Employee ID</label>
+          <input type="number" [(ngModel)]="viewEmpId" placeholder="1" class="form-input" />
+        </div>
+        <div class="field">
+          <label>Month</label>
+          <input type="month" [(ngModel)]="viewMonth" class="form-input" />
+        </div>
+        <div class="field field-btn">
+          <label>&nbsp;</label>
+          <button pButton label="View" icon="pi pi-eye" severity="secondary" (click)="viewReport()"></button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ── EMPLOYEE: My Reports ──────────────────────────── -->
+  @if (!auth.isAdmin()) {
+    <div class="section-card">
+      <div class="card-header">
+        <h3><i class="pi pi-list"></i> My Salary Reports</h3>
+        <button pButton label="Refresh" icon="pi pi-refresh" severity="secondary"
+                size="small" (click)="loadMyReports()"></button>
+      </div>
+      <p-table [value]="myReports" [loading]="loading"
+               styleClass="p-datatable-sm p-datatable-striped"
+               [paginator]="true" [rows]="12">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Month</th><th>Gross</th><th>PF</th><th>ESIC</th>
+            <th>Prof.Tax</th><th>Other Cuts</th><th>Overtime</th><th>Net Salary</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-r>
+          <tr>
+            <td><strong>{{ r.month }}</strong></td>
+            <td>₹{{ r.grossSalary | number }}</td>
+            <td class="red">-₹{{ r.pfDeduction | number }}</td>
+            <td class="red">-₹{{ r.esicDeduction | number }}</td>
+            <td class="red">-₹{{ r.professionalTax | number }}</td>
+            <td class="red">-₹{{ (r.absentDeduction + r.lateDeduction) | number }}</td>
+            <td class="green">+₹{{ r.overtimePay | number }}</td>
+            <td><span class="net-chip">₹{{ r.netSalary | number:'1.0-0' }}</span></td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr><td colspan="8" class="empty-cell">Koi salary report nathi</td></tr>
+        </ng-template>
+      </p-table>
+    </div>
+  }
+
+</div>
