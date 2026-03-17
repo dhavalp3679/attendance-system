@@ -1,0 +1,157 @@
+<p-toast></p-toast>
+
+<div class="leaves">
+
+  <div class="page-header">
+    <div>
+      <h1>Leave Management</h1>
+      <p>{{ auth.isAdmin() ? 'Review and manage leave requests' : 'Apply and track your leaves' }}</p>
+    </div>
+    @if (!auth.isAdmin()) {
+      <button pButton label="Apply Leave" icon="pi pi-plus" (click)="showApply = true"></button>
+    }
+  </div>
+
+  <!-- Employee Balance Cards -->
+  @if (!auth.isAdmin()) {
+    <div class="balance-row">
+      <div class="balance-card blue">
+        <i class="pi pi-calendar-check"></i>
+        <div>
+          <span class="val">{{ clBalance - clUsed }}</span>
+          <span class="lbl">CL Remaining</span>
+        </div>
+      </div>
+      <div class="balance-card orange">
+        <i class="pi pi-calendar-minus"></i>
+        <div>
+          <span class="val">{{ clUsed }}</span>
+          <span class="lbl">CL Used</span>
+        </div>
+      </div>
+      <div class="balance-card red">
+        <i class="pi pi-times-circle"></i>
+        <div>
+          <span class="val">{{ lwpCount }}</span>
+          <span class="lbl">LWP Days</span>
+        </div>
+      </div>
+      <div class="balance-card gray">
+        <i class="pi pi-info-circle"></i>
+        <div>
+          <span class="val">12</span>
+          <span class="lbl">Total CL/Year</span>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Admin Tabs -->
+  @if (auth.isAdmin()) {
+    <div class="tabs">
+      <button class="tab" [class.active]="activeTab === 'pending'"
+              (click)="activeTab = 'pending'; loadPending()">
+        <i class="pi pi-clock"></i> Pending
+        <span class="badge">{{ pendingLeaves.length }}</span>
+      </button>
+      <button class="tab" [class.active]="activeTab === 'all'"
+              (click)="activeTab = 'all'; loadAll()">
+        <i class="pi pi-list"></i> All Leaves
+      </button>
+    </div>
+  }
+
+  <!-- Leave Table -->
+  <div class="section-card">
+    <p-table [value]="tableData" [loading]="loading"
+             styleClass="p-datatable-sm p-datatable-striped"
+             [paginator]="true" [rows]="10">
+      <ng-template pTemplate="header">
+        <tr>
+          @if (auth.isAdmin()) { <th>Employee</th> }
+          <th>From</th><th>To</th><th>Days</th>
+          <th>Type</th><th>Reason</th><th>Status</th>
+          @if (auth.isAdmin()) { <th>Actions</th> }
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-leave>
+        <tr>
+          @if (auth.isAdmin()) {
+            <td><strong>{{ leave.employeeName }}</strong></td>
+          }
+          <td>{{ leave.fromDate | date:'dd MMM yyyy' }}</td>
+          <td>{{ leave.toDate | date:'dd MMM yyyy' }}</td>
+          <td><strong>{{ leave.numberOfDays }}</strong></td>
+          <td><span class="type-chip" [class]="leave.leaveType === 'CL' ? 'cl' : 'lwp'">{{ leave.leaveType }}</span></td>
+          <td class="reason-cell">{{ leave.reason | slice:0:40 }}{{ (leave.reason?.length || 0) > 40 ? '...' : '' }}</td>
+          <td><p-tag [value]="leave.status" [severity]="getStatusSeverity(leave.status)"></p-tag></td>
+          @if (auth.isAdmin()) {
+            <td>
+              @if (leave.status === 'PENDING') {
+                <div class="action-group">
+                  <button pButton icon="pi pi-check" severity="success" size="small"
+                          pTooltip="Approve" (click)="openDecide(leave, 'APPROVED')"></button>
+                  <button pButton icon="pi pi-times" severity="danger" size="small"
+                          pTooltip="Reject" (click)="openDecide(leave, 'REJECTED')"></button>
+                </div>
+              } @else {
+                <span class="decided">{{ leave.decidedBy || '—' }}</span>
+              }
+            </td>
+          }
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr><td [attr.colspan]="auth.isAdmin() ? 8 : 7" class="empty-cell">Koi leave request nathi</td></tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Apply Leave Dialog -->
+  <p-dialog header="Apply for Leave" [(visible)]="showApply" [modal]="true"
+            [style]="{width:'480px'}" [draggable]="false">
+    <div class="dialog-form">
+      <div class="field"><label>Leave Type</label>
+        <p-select [(ngModel)]="applyForm.leaveType" [options]="leaveTypes" styleClass="w-full"></p-select>
+      </div>
+      <div class="field"><label>From Date</label>
+        <input type="date" [(ngModel)]="applyForm.fromDate" class="date-input" />
+      </div>
+      <div class="field"><label>To Date</label>
+        <input type="date" [(ngModel)]="applyForm.toDate" class="date-input" />
+      </div>
+      <div class="field"><label>Reason</label>
+        <textarea pTextarea [(ngModel)]="applyForm.reason" rows="3" placeholder="Leave reason..." style="width:100%"></textarea>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <button pButton label="Cancel" severity="secondary" (click)="showApply = false"></button>
+      <button pButton label="Submit" icon="pi pi-send" (click)="applyLeave()" [loading]="applyLoading"></button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Decide Dialog -->
+  <p-dialog header="Leave Decision" [(visible)]="showDecide" [modal]="true"
+            [style]="{width:'440px'}" [draggable]="false">
+    <div class="dialog-form">
+      <div class="emp-info">
+        <strong>{{ selectedLeave?.employeeName }}</strong>
+        <span>{{ selectedLeave?.fromDate | date:'dd MMM' }} – {{ selectedLeave?.toDate | date:'dd MMM yyyy' }}</span>
+      </div>
+      <div class="field"><label>Decision</label>
+        <p-select [(ngModel)]="decideForm.status" [options]="decideOptions" styleClass="w-full"></p-select>
+      </div>
+      <div class="field"><label>Leave Type</label>
+        <p-select [(ngModel)]="decideForm.leaveType" [options]="leaveTypes" styleClass="w-full"></p-select>
+      </div>
+      <div class="field"><label>Admin Note (Optional)</label>
+        <input pInputText [(ngModel)]="decideForm.adminNote" placeholder="Note..." style="width:100%" />
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <button pButton label="Cancel" severity="secondary" (click)="showDecide = false"></button>
+      <button pButton label="Confirm" icon="pi pi-check" (click)="submitDecision()" [loading]="decideLoading"></button>
+    </ng-template>
+  </p-dialog>
+
+</div>

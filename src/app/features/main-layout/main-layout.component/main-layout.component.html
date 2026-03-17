@@ -1,0 +1,65 @@
+<div class="app-shell">
+
+  <!-- TOP NAVBAR -->
+  <header class="navbar">
+    <div class="navbar-brand">
+      <i class="pi pi-building"></i>
+      <span>AttendancePro</span>
+    </div>
+
+    <nav class="navbar-nav">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+        <i class="pi pi-home"></i>
+        <span>Dashboard</span>
+      </a>
+
+      <a routerLink="/attendance" routerLinkActive="active" class="nav-item">
+        <i class="pi pi-clock"></i>
+        <span>Attendance</span>
+      </a>
+
+      @if (auth.isAdmin()) {
+        <a routerLink="/employees" routerLinkActive="active" class="nav-item">
+          <i class="pi pi-users"></i>
+          <span>Employees</span>
+        </a>
+      }
+
+      <a routerLink="/leaves" routerLinkActive="active" class="nav-item">
+        <i class="pi pi-calendar-minus"></i>
+        <span>Leaves</span>
+      </a>
+
+      @if (auth.isAdmin()) {
+        <a routerLink="/holidays" routerLinkActive="active" class="nav-item">
+          <i class="pi pi-calendar"></i>
+          <span>Holidays</span>
+        </a>
+      }
+
+      <a routerLink="/salary" routerLinkActive="active" class="nav-item">
+        <i class="pi pi-wallet"></i>
+        <span>Salary</span>
+      </a>
+    </nav>
+
+    <div class="navbar-user">
+      <div class="user-details">
+        <span class="user-name">{{ auth.currentUser()?.name }}</span>
+        <span class="user-role" [class.admin]="auth.isAdmin()" [class.employee]="!auth.isAdmin()">
+          {{ auth.currentUser()?.role }}
+        </span>
+      </div>
+      <div class="avatar">{{ userInitials }}</div>
+      <button class="logout-btn" pTooltip="Logout" tooltipPosition="bottom" (click)="logout()">
+        <i class="pi pi-sign-out"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- PAGE CONTENT -->
+  <main class="page-content">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>

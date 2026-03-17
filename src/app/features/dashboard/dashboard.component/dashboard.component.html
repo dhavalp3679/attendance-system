@@ -1,0 +1,150 @@
+<div class="dashboard">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-text">
+      <h1>Dashboard</h1>
+      <p>Welcome back, <strong>{{ auth.currentUser()?.name }}</strong>! 👋</p>
+    </div>
+    <div class="date-chip">
+      <i class="pi pi-calendar"></i>
+      {{ today | date: 'EEEE, dd MMMM yyyy' }}
+    </div>
+  </div>
+
+  <!-- ADMIN VIEW -->
+  @if (auth.isAdmin()) {
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card blue">
+        <div class="stat-icon"><i class="pi pi-users"></i></div>
+        <div class="stat-body">
+          <span class="stat-value">{{ totalEmployees }}</span>
+          <span class="stat-label">Total Employees</span>
+        </div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon"><i class="pi pi-check-circle"></i></div>
+        <div class="stat-body">
+          <span class="stat-value">{{ presentCount }}</span>
+          <span class="stat-label">Present Today</span>
+        </div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-icon"><i class="pi pi-clock"></i></div>
+        <div class="stat-body">
+          <span class="stat-value">{{ lateCount }}</span>
+          <span class="stat-label">Late Today</span>
+        </div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-icon"><i class="pi pi-times-circle"></i></div>
+        <div class="stat-body">
+          <span class="stat-value">{{ absentCount }}</span>
+          <span class="stat-label">Absent Today</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Today's Attendance Table -->
+    <div class="card">
+      <div class="card-header">
+        <h3><i class="pi pi-list-check"></i> Today's Attendance</h3>
+        <a routerLink="/attendance" class="view-all">View All <i class="pi pi-arrow-right"></i></a>
+      </div>
+      <p-table
+        [value]="todayRecords"
+        [loading]="loading"
+        styleClass="p-datatable-sm p-datatable-striped"
+        [paginator]="true"
+        [rows]="8"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>#</th>
+            <th>Employee</th>
+            <th>Punch In</th>
+            <th>Punch Out</th>
+            <th>Status</th>
+            <th>Overtime</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-row let-i="rowIndex">
+          <tr>
+            <td>{{ i + 1 }}</td>
+            <td><strong>{{ row.employeeName }}</strong></td>
+            <td>{{ row.punchInTime || '—' }}</td>
+            <td>{{ row.punchOutTime || '—' }}</td>
+            <td>
+              <p-tag [value]="row.status" [severity]="getSeverity(row.status)"></p-tag>
+            </td>
+            <td>{{ getOvertimeHours(row.overtimeMinutes) }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6" class="empty-cell">Aaj koi attendance record nathi</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+  }
+
+  <!-- EMPLOYEE VIEW -->
+  @if (!auth.isAdmin()) {
+    <div class="employee-dashboard">
+
+      <div class="my-status-card">
+        <h3>My Today's Status</h3>
+        @if (myTodayStatus) {
+          <div class="status-grid">
+            <div class="status-item">
+              <span class="label">Status</span>
+              <p-tag [value]="myTodayStatus.status || '—'" [severity]="getSeverity(myTodayStatus.status || '')"></p-tag>
+            </div>
+            <div class="status-item">
+              <span class="label">Punch In</span>
+              <strong>{{ myTodayStatus.punchInTime || 'Not yet' }}</strong>
+            </div>
+            <div class="status-item">
+              <span class="label">Punch Out</span>
+              <strong>{{ myTodayStatus.punchOutTime || 'Not yet' }}</strong>
+            </div>
+            <div class="status-item">
+              <span class="label">Overtime</span>
+              <strong>{{ getOvertimeHours(myTodayStatus.overtimeMinutes || 0) }}</strong>
+            </div>
+          </div>
+        } @else {
+          <div class="no-punch">
+            <i class="pi pi-exclamation-triangle"></i>
+            <p>Aaj punch in nathi karyu!</p>
+            <a routerLink="/attendance" pButton label="Go to Attendance"></a>
+          </div>
+        }
+      </div>
+
+      <div class="quick-links">
+        <h3>Quick Actions</h3>
+        <div class="links-grid">
+          <a routerLink="/attendance" class="quick-link blue">
+            <i class="pi pi-clock"></i>
+            <span>Attendance</span>
+          </a>
+          <a routerLink="/leaves" class="quick-link green">
+            <i class="pi pi-calendar-minus"></i>
+            <span>Apply Leave</span>
+          </a>
+          <a routerLink="/salary" class="quick-link purple">
+            <i class="pi pi-wallet"></i>
+            <span>My Salary</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  }
+
+</div>
