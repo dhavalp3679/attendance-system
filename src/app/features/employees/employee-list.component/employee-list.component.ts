@@ -10,8 +10,6 @@ import {ConfirmDialog} from 'primeng/confirmdialog';
 import {Toast} from 'primeng/toast';
 import {Tag} from 'primeng/tag';
 import {DecimalPipe} from '@angular/common';
-import { TooltipModule } from 'primeng/tooltip';
-import {ButtonModule} from 'primeng/button';
 
 @Component({
   selector: 'app-employee-list.component',
@@ -22,12 +20,8 @@ import {ButtonModule} from 'primeng/button';
     ConfirmDialog,
     Toast,
     Tag,
-    DecimalPipe,
-    TooltipModule,
-    ButtonModule
-
+    DecimalPipe
   ],
-  providers: [MessageService,ConfirmationService],
   templateUrl: './employee-list.component.html',
   styleUrl: './employee-list.component.scss',
 })

@@ -18,7 +18,6 @@ import {Toast} from 'primeng/toast';
     Select,
     Toast
   ],
-  providers: [MessageService],
   templateUrl: './employee-form.component.html',
   styleUrl: './employee-form.component.scss',
 })
@@ -49,71 +48,37 @@ export class EmployeeFormComponent implements OnInit {
       this.isEdit = true;
       this.empId = +id;
       this.employeeSvc.getById(this.empId).subscribe({
-        next: res => {
-          Object.assign(this.form, res.data);
-          // Edit mode ma password clear karo — user navu nakhse to j update thase
-          this.form.password = '';
-        }
+        next: res => { Object.assign(this.form, res.data); }
       });
     }
   }
 
   save(): void {
-    // Required fields check
     if (!this.form.name || !this.form.email || !this.form.department ||
       !this.form.designation || !this.form.salary) {
-      this.msgSvc.add({
-        severity: 'warn',
-        summary: 'Required Fields',
-        detail: 'Badha starred fields jaruri che!'
-      });
+      this.msgSvc.add({ severity: 'warn', summary: 'Required Fields', detail: 'Badha starred fields jaruri che!' });
       return;
     }
-
-    // Add mode ma password jaruri che
-    if (!this.isEdit && (!this.form.password || this.form.password.length < 6)) {
-      this.msgSvc.add({
-        severity: 'warn',
-        summary: 'Password Required',
-        detail: 'Password minimum 6 characters joie!'
-      });
-      return;
-    }
-
     this.loading = true;
-
-    // Edit mode ma password empty hoy to send nahi karvo
-    const payload = { ...this.form };
-    if (this.isEdit && !payload.password) {
-      delete (payload as any).password;
-    }
-
     const call = this.isEdit
-      ? this.employeeSvc.update(this.empId!, payload)
-      : this.employeeSvc.add(payload);
+      ? this.employeeSvc.update(this.empId!, this.form)
+      : this.employeeSvc.add(this.form);
 
     call.subscribe({
       next: () => {
         this.loading = false;
-        this.msgSvc.add({
-          severity: 'success',
-          summary: 'Success!',
-          detail: this.isEdit ? 'Employee updated!' : 'Employee added!'
-        });
-        setTimeout(() => void this.router.navigate(['/employees']), 800);
+        this.msgSvc.add({ severity: 'success', summary: 'Success!',
+          detail: this.isEdit ? 'Employee updated!' : 'Employee added!' });
+        setTimeout(() => this.router.navigate(['/employees']), 800);
       },
       error: err => {
         this.loading = false;
-        this.msgSvc.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err?.error?.message || 'Failed!'
-        });
+        this.msgSvc.add({ severity: 'error', summary: 'Error', detail: err?.error?.message || 'Failed!' });
       }
     });
   }
 
   cancel(): void {
-    void this.router.navigate(['/employees']);
+    this.router.navigate(['/employees']);
   }
 }

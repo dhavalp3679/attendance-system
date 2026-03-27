@@ -24,7 +24,7 @@ import {Toast} from 'primeng/toast';
     TableModule,
     Toast,
     SlicePipe
-  ],providers: [MessageService],
+  ],
   templateUrl: './leave-list.component.html',
   styleUrl: './leave-list.component.scss',
 })
