@@ -1,0 +1,134 @@
+<p-toast></p-toast>
+
+<div class="gps-page">
+  <div class="page-header">
+    <div>
+      <h1>📍 GPS Attendance</h1>
+      <p>Location verify karine punch in/out karo</p>
+    </div>
+  </div>
+
+  <div class="gps-grid">
+
+    <!-- ── LEFT: Location Card ──────────────────────────────────────── -->
+    <div class="card location-card">
+      <h3><i class="pi pi-map-marker"></i> Tari Location</h3>
+
+      @if (!currentLat) {
+        <div class="no-location">
+          <i class="pi pi-map-marker" style="font-size:3rem; color:#cbd5e1"></i>
+          <p>Location abhi nathi malyu</p>
+          <button pButton label="📍 Location Levo" icon="pi pi-crosshairs"
+                  (click)="getLocation()" [loading]="locationLoading"
+                  severity="primary" size="large"></button>
+        </div>
+      } @else {
+        <div class="location-info">
+          <div class="coord-row">
+            <div class="coord-item">
+              <span>Latitude</span>
+              <strong>{{ currentLat | number:'1.6-6' }}</strong>
+            </div>
+            <div class="coord-item">
+              <span>Longitude</span>
+              <strong>{{ currentLng | number:'1.6-6' }}</strong>
+            </div>
+          </div>
+
+          @if (distance !== null) {
+            <div class="distance-badge" [class.in-range]="inRange" [class.out-range]="!inRange">
+              @if (inRange) {
+                <i class="pi pi-check-circle"></i>
+                <span>Office range ma che! ({{ distance }}m)</span>
+              } @else {
+                <i class="pi pi-times-circle"></i>
+                <span>Office thi {{ distance }}m door che!</span>
+              }
+            </div>
+          }
+
+          <button pButton label="🔄 Refresh Location" icon="pi pi-refresh"
+                  (click)="getLocation()" [loading]="locationLoading"
+                  severity="secondary" size="small" class="mt-1"></button>
+        </div>
+      }
+
+      @if (locationError) {
+        <div class="error-msg">{{ locationError }}</div>
+      }
+    </div>
+
+    <!-- ── RIGHT: Punch Card ─────────────────────────────────────────── -->
+    <div class="card punch-card">
+      <h3><i class="pi pi-clock"></i> Aaj no Status</h3>
+
+      @if (todayStatus && todayStatus.status !== 'ABSENT') {
+        <div class="status-info">
+          <div class="status-row">
+            <div class="status-item">
+              <span>Status</span>
+              <p-tag [value]="todayStatus.status"
+                     [severity]="getSeverity(todayStatus.status)"></p-tag>
+            </div>
+            <div class="status-item">
+              <span>Punch In</span>
+              <strong>{{ todayStatus.punchInTime || '—' }}</strong>
+            </div>
+            <div class="status-item">
+              <span>Punch Out</span>
+              <strong>{{ todayStatus.punchOutTime || '—' }}</strong>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <p class="no-record">Aaj punch in nathi karyu!</p>
+      }
+
+      <div class="punch-btns">
+        <button pButton label="✅ GPS Punch In"
+                icon="pi pi-sign-in" severity="success" size="large"
+                (click)="gpsPunchIn()"
+                [loading]="punchLoading"
+                [disabled]="!canPunchIn || !currentLat || !inRange">
+        </button>
+        <button pButton label="👋 GPS Punch Out"
+                icon="pi pi-sign-out" severity="danger" size="large"
+                (click)="gpsPunchOut()"
+                [loading]="punchLoading"
+                [disabled]="!canPunchOut || !currentLat || !inRange">
+        </button>
+      </div>
+
+      @if (currentLat && !inRange) {
+        <div class="warning-msg">
+          ⚠️ Office range bahar cho — punch in/out nahi thay!
+        </div>
+      }
+    </div>
+
+    <!-- ── MAP ──────────────────────────────────────────────────────── -->
+    <div class="card map-card">
+      <h3><i class="pi pi-map"></i> Office Location Map</h3>
+      @if (officeLocation) {
+        <div class="map-info">
+          <span>🏢 {{ officeLocation.name }}</span>
+          <span>📏 Range: {{ officeLocation.radiusMeters }}m</span>
+        </div>
+        <div class="map-container">
+          <iframe
+            [src]="mapUrl | trustedUrl"
+            width="100%"
+            height="300"
+            style="border:0; border-radius: 8px;"
+            loading="lazy">
+          </iframe>
+        </div>
+      } @else {
+        <div class="no-location">
+          <p>Office location set nathi — Admin ne contact karo</p>
+        </div>
+      }
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,176 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="shifts-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1>⏰ Shift Management</h1>
+      <p>Shifts banavo ane employees ne assign karo</p>
+    </div>
+    <div class="header-btns">
+      <button pButton label="Shift Assign Karo" icon="pi pi-user-edit"
+              severity="success" (click)="openAssignDialog()"></button>
+      <button pButton label="New Shift" icon="pi pi-plus"
+              (click)="openAddDialog()"></button>
+    </div>
+  </div>
+
+  <div class="grid-layout">
+
+    <!-- ── Shifts Table ────────────────────────────────────────────── -->
+    <div class="section-card">
+      <div class="card-header">
+        <h3><i class="pi pi-calendar"></i> Badha Shifts</h3>
+      </div>
+      <p-table [value]="shifts" [loading]="loading"
+               styleClass="p-datatable-sm p-datatable-striped">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>#</th>
+            <th>Shift Name</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-shift let-i="rowIndex">
+          <tr>
+            <td>{{ i+1 }}</td>
+            <td><strong>{{ shift.name }}</strong></td>
+            <td><span class="time-badge">🕐 {{ formatTime(shift.startTime) }}</span></td>
+            <td><span class="time-badge">🕕 {{ formatTime(shift.endTime) }}</span></td>
+            <td>{{ shift.description || '—' }}</td>
+            <td>
+              <div class="action-btns">
+                <button pButton icon="pi pi-pencil" size="small"
+                        severity="secondary" (click)="openEditDialog(shift)"></button>
+                <button pButton icon="pi pi-trash" size="small"
+                        severity="danger" (click)="deleteShift(shift)"></button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr><td colspan="6" class="empty-cell">Koi shift nathi — "New Shift" banavo!</td></tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <!-- ── Employees Shift Status ──────────────────────────────────── -->
+    <div class="section-card mt">
+      <div class="card-header">
+        <h3><i class="pi pi-users"></i> Employees — Shift Status</h3>
+      </div>
+      <p-table [value]="employees" styleClass="p-datatable-sm p-datatable-striped">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>#</th>
+            <th>Employee</th>
+            <th>Department</th>
+            <th>Current Shift</th>
+            <th>Action</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-emp let-i="rowIndex">
+          <tr>
+            <td>{{ i+1 }}</td>
+            <td>
+              <div class="emp-cell">
+                <div class="emp-avatar">{{ emp.name[0] }}</div>
+                <span>{{ emp.name }}</span>
+              </div>
+            </td>
+            <td><span class="dept-chip">{{ emp.department }}</span></td>
+            <td>
+              @if (emp.shift) {
+                <span class="shift-chip">
+                  ⏰ {{ emp.shift.name }}
+                  ({{ formatTime(emp.shift.startTime) }} - {{ formatTime(emp.shift.endTime) }})
+                </span>
+              } @else {
+                <span class="no-shift">No shift assigned</span>
+              }
+            </td>
+            <td>
+              @if (emp.shift) {
+                <button pButton icon="pi pi-times" size="small"
+                        severity="danger" label="Remove"
+                        (click)="removeShift(emp.id, emp.name)"></button>
+              } @else {
+                <span class="muted">—</span>
+              }
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Add/Edit Shift Dialog ──────────────────────────────────────── -->
+<p-dialog [header]="shiftDialogMode === 'add' ? '➕ New Shift' : '✏️ Shift Edit'"
+          [(visible)]="showShiftDialog" [modal]="true"
+          [style]="{width: '450px'}" [draggable]="false">
+  <div class="dialog-form">
+    <div class="form-group">
+      <label>Shift Name *</label>
+      <input type="text" pInputText [(ngModel)]="shiftForm.name"
+             placeholder="e.g. Morning Shift" class="w-full" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Start Time *</label>
+        <input type="time" [(ngModel)]="shiftForm.startTime" class="time-input" />
+      </div>
+      <div class="form-group">
+        <label>End Time *</label>
+        <input type="time" [(ngModel)]="shiftForm.endTime" class="time-input" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Description</label>
+      <input type="text" pInputText [(ngModel)]="shiftForm.description"
+             placeholder="Optional description" class="w-full" />
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" severity="secondary" (click)="showShiftDialog = false"></button>
+    <button pButton [label]="shiftDialogMode === 'add' ? 'Add Karo' : 'Update Karo'"
+            severity="success" (click)="saveShift()" [loading]="shiftLoading"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- ── Assign Shift Dialog ─────────────────────────────────────────── -->
+<p-dialog header="👤 Employee ne Shift Assign Karo"
+          [(visible)]="showAssignDialog" [modal]="true"
+          [style]="{width: '450px'}" [draggable]="false">
+  <div class="dialog-form">
+    <div class="form-group">
+      <label>Employee Select Karo *</label>
+      <p-select [options]="employeeOptions" [(ngModel)]="assignForm.employeeId"
+                optionLabel="label" optionValue="value"
+                placeholder="Employee select karo" styleClass="w-full">
+      </p-select>
+    </div>
+    <div class="form-group">
+      <label>Shift Select Karo *</label>
+      <p-select [options]="shiftOptions" [(ngModel)]="assignForm.shiftId"
+                optionLabel="label" optionValue="value"
+                placeholder="Shift select karo" styleClass="w-full">
+      </p-select>
+    </div>
+    <div class="info-box">
+      📱 Assign thaya pachhi employee ne WhatsApp notification jaashe!
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" severity="secondary"
+            (click)="showAssignDialog = false"></button>
+    <button pButton label="Assign Karo" severity="success"
+            (click)="assignShift()" [loading]="assignLoading"></button>
+  </ng-template>
+</p-dialog>
