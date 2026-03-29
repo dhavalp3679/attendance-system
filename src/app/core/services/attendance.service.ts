@@ -32,5 +32,8 @@ export class AttendanceService {
   getMonthly(empId: number, month: string): Observable<ApiResponse<AttendanceRecord[]>> {
     return this.http.get<ApiResponse<AttendanceRecord[]>>(`${this.API}/${empId}/monthly?month=${month}`);
   }
+  addAttendance(payload: any): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.API}/admin/add`, payload);
+  }
 }
 

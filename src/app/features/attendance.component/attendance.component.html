@@ -1,3 +1,325 @@
+<!--&lt;!&ndash;<p-toast></p-toast>&ndash;&gt;-->
+
+<!--&lt;!&ndash;<div class="attendance">&ndash;&gt;-->
+
+<!--&lt;!&ndash;  <div class="page-header">&ndash;&gt;-->
+<!--&lt;!&ndash;    <div>&ndash;&gt;-->
+<!--&lt;!&ndash;      <h1>Attendance</h1>&ndash;&gt;-->
+<!--&lt;!&ndash;      <p>{{ auth.isAdmin() ? 'Track all employee attendance' : 'Mark and view your attendance' }}</p>&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;  </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;  &lt;!&ndash; ── EMPLOYEE PUNCH CARD ─────────────────────────────── &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;  @if (!auth.isAdmin()) {&ndash;&gt;-->
+<!--&lt;!&ndash;    <div class="punch-card">&ndash;&gt;-->
+<!--&lt;!&ndash;      <div class="punch-clock">&ndash;&gt;-->
+<!--&lt;!&ndash;        <div class="time">{{ currentTime | date:'hh:mm:ss a' }}</div>&ndash;&gt;-->
+<!--&lt;!&ndash;        <div class="date">{{ today | date:'EEEE, dd MMMM yyyy' }}</div>&ndash;&gt;-->
+<!--&lt;!&ndash;      </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;      <div class="punch-divider"></div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;      <div class="punch-status">&ndash;&gt;-->
+<!--&lt;!&ndash;        @if (myStatus) {&ndash;&gt;-->
+<!--&lt;!&ndash;          <div class="status-row">&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="status-item">&ndash;&gt;-->
+<!--&lt;!&ndash;              <span>Status</span>&ndash;&gt;-->
+<!--&lt;!&ndash;              <p-tag [value]="myStatus.status || '—'" [severity]="getSeverity(myStatus.status)"></p-tag>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="status-item">&ndash;&gt;-->
+<!--&lt;!&ndash;              <span>Punch In</span>&ndash;&gt;-->
+<!--&lt;!&ndash;              <strong>{{ myStatus.punchInTime || '—' }}</strong>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="status-item">&ndash;&gt;-->
+<!--&lt;!&ndash;              <span>Punch Out</span>&ndash;&gt;-->
+<!--&lt;!&ndash;              <strong>{{ myStatus.punchOutTime || '—' }}</strong>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;            <div class="status-item">&ndash;&gt;-->
+<!--&lt;!&ndash;              <span>Overtime</span>&ndash;&gt;-->
+<!--&lt;!&ndash;              <strong class="ot">{{ getOT(myStatus.overtimeMinutes) }}</strong>&ndash;&gt;-->
+<!--&lt;!&ndash;            </div>&ndash;&gt;-->
+<!--&lt;!&ndash;          </div>&ndash;&gt;-->
+<!--&lt;!&ndash;        } @else {&ndash;&gt;-->
+<!--&lt;!&ndash;          <p class="no-record">Aaj koi record nathi — punch in karo!</p>&ndash;&gt;-->
+<!--&lt;!&ndash;        }&ndash;&gt;-->
+
+<!--&lt;!&ndash;        <div class="punch-btns">&ndash;&gt;-->
+<!--&lt;!&ndash;          <button pButton label="Punch In" icon="pi pi-sign-in" severity="success"&ndash;&gt;-->
+<!--&lt;!&ndash;                  (click)="punchIn()" [loading]="punchLoading" [disabled]="!canPunchIn"></button>&ndash;&gt;-->
+<!--&lt;!&ndash;          <button pButton label="Punch Out" icon="pi pi-sign-out" severity="danger"&ndash;&gt;-->
+<!--&lt;!&ndash;                  (click)="punchOut()" [loading]="punchLoading" [disabled]="!canPunchOut"></button>&ndash;&gt;-->
+<!--&lt;!&ndash;        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;      </div>&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;  }&ndash;&gt;-->
+
+<!--&lt;!&ndash;  &lt;!&ndash; ── ADMIN: TODAY TABLE ──────────────────────────────── &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;  @if (auth.isAdmin()) {&ndash;&gt;-->
+<!--&lt;!&ndash;    <div class="section-card">&ndash;&gt;-->
+<!--&lt;!&ndash;      <div class="card-header">&ndash;&gt;-->
+<!--&lt;!&ndash;        <h3><i class="pi pi-users"></i> Today's Attendance</h3>&ndash;&gt;-->
+<!--&lt;!&ndash;        <button pButton label="Refresh" icon="pi pi-refresh" severity="secondary"&ndash;&gt;-->
+<!--&lt;!&ndash;                size="small" (click)="loadAllToday()"></button>&ndash;&gt;-->
+<!--&lt;!&ndash;      </div>&ndash;&gt;-->
+<!--&lt;!&ndash;      <p-table [value]="allToday" [loading]="loading"&ndash;&gt;-->
+<!--&lt;!&ndash;               styleClass="p-datatable-sm p-datatable-striped"&ndash;&gt;-->
+<!--&lt;!&ndash;               [paginator]="true" [rows]="10">&ndash;&gt;-->
+<!--&lt;!&ndash;        <ng-template pTemplate="header">&ndash;&gt;-->
+<!--&lt;!&ndash;          <tr>&ndash;&gt;-->
+<!--&lt;!&ndash;            <th>#</th><th>Employee</th><th>Punch In</th>&ndash;&gt;-->
+<!--&lt;!&ndash;            <th>Punch Out</th><th>Status</th><th>Overtime</th>&ndash;&gt;-->
+<!--&lt;!&ndash;          </tr>&ndash;&gt;-->
+<!--&lt;!&ndash;        </ng-template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <ng-template pTemplate="body" let-row let-i="rowIndex">&ndash;&gt;-->
+<!--&lt;!&ndash;          <tr>&ndash;&gt;-->
+<!--&lt;!&ndash;            <td>{{ i+1 }}</td>&ndash;&gt;-->
+<!--&lt;!&ndash;            <td><strong>{{ row.employeeName }}</strong></td>&ndash;&gt;-->
+<!--&lt;!&ndash;            <td>{{ row.punchInTime || '—' }}</td>&ndash;&gt;-->
+<!--&lt;!&ndash;            <td>{{ row.punchOutTime || '—' }}</td>&ndash;&gt;-->
+<!--&lt;!&ndash;            <td><p-tag [value]="row.status" [severity]="getSeverity(row.status)"></p-tag></td>&ndash;&gt;-->
+<!--&lt;!&ndash;            <td>{{ getOT(row.overtimeMinutes) }}</td>&ndash;&gt;-->
+<!--&lt;!&ndash;          </tr>&ndash;&gt;-->
+<!--&lt;!&ndash;        </ng-template>&ndash;&gt;-->
+<!--&lt;!&ndash;        <ng-template pTemplate="emptymessage">&ndash;&gt;-->
+<!--&lt;!&ndash;          <tr><td colspan="6" class="empty-cell">Aaj koi attendance nathi</td></tr>&ndash;&gt;-->
+<!--&lt;!&ndash;        </ng-template>&ndash;&gt;-->
+<!--&lt;!&ndash;      </p-table>&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+
+<!--&lt;!&ndash;    &lt;!&ndash; Monthly Report &ndash;&gt;&ndash;&gt;-->
+<!--&lt;!&ndash;    <div class="section-card" style="margin-top: 1.5rem;">&ndash;&gt;-->
+<!--&lt;!&ndash;      <div class="card-header">&ndash;&gt;-->
+<!--&lt;!&ndash;        <h3><i class="pi pi-chart-bar"></i> Monthly Report</h3>&ndash;&gt;-->
+<!--&lt;!&ndash;        <div class="filter-row">&ndash;&gt;-->
+<!--&lt;!&ndash;          <input type="number" [(ngModel)]="filterEmpId" placeholder="Employee ID" class="filter-input" />&ndash;&gt;-->
+<!--&lt;!&ndash;          <input type="month" [(ngModel)]="filterMonth" class="filter-input" />&ndash;&gt;-->
+<!--&lt;!&ndash;          <button pButton label="Load" icon="pi pi-search" size="small" (click)="loadMonthly()"></button>&ndash;&gt;-->
+<!--&lt;!&ndash;        </div>&ndash;&gt;-->
+<!--&lt;!&ndash;      </div>&ndash;&gt;-->
+<!--&lt;!&ndash;      @if (monthlyRecords.length > 0) {&ndash;&gt;-->
+<!--&lt;!&ndash;        <p-table [value]="monthlyRecords" styleClass="p-datatable-sm" [paginator]="true" [rows]="15">&ndash;&gt;-->
+<!--&lt;!&ndash;          <ng-template pTemplate="header">&ndash;&gt;-->
+<!--&lt;!&ndash;            <tr>&ndash;&gt;-->
+<!--&lt;!&ndash;              <th>Date</th><th>Day</th><th>Punch In</th>&ndash;&gt;-->
+<!--&lt;!&ndash;              <th>Punch Out</th><th>Status</th><th>Overtime</th>&ndash;&gt;-->
+<!--&lt;!&ndash;            </tr>&ndash;&gt;-->
+<!--&lt;!&ndash;          </ng-template>&ndash;&gt;-->
+<!--&lt;!&ndash;          <ng-template pTemplate="body" let-row>&ndash;&gt;-->
+<!--&lt;!&ndash;            <tr>&ndash;&gt;-->
+<!--&lt;!&ndash;              <td>{{ row.date | date:'dd MMM yyyy' }}</td>&ndash;&gt;-->
+<!--&lt;!&ndash;              <td>{{ row.date | date:'EEE' }}</td>&ndash;&gt;-->
+<!--&lt;!&ndash;              <td>{{ row.punchInTime || '—' }}</td>&ndash;&gt;-->
+<!--&lt;!&ndash;              <td>{{ row.punchOutTime || '—' }}</td>&ndash;&gt;-->
+<!--&lt;!&ndash;              <td><p-tag [value]="row.status" [severity]="getSeverity(row.status)"></p-tag></td>&ndash;&gt;-->
+<!--&lt;!&ndash;              <td>{{ getOT(row.overtimeMinutes) }}</td>&ndash;&gt;-->
+<!--&lt;!&ndash;            </tr>&ndash;&gt;-->
+<!--&lt;!&ndash;          </ng-template>&ndash;&gt;-->
+<!--&lt;!&ndash;        </p-table>&ndash;&gt;-->
+<!--&lt;!&ndash;      }&ndash;&gt;-->
+<!--&lt;!&ndash;    </div>&ndash;&gt;-->
+<!--&lt;!&ndash;  }&ndash;&gt;-->
+
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+
+
+
+<!--<p-toast></p-toast>-->
+
+<!--<div class="attendance">-->
+
+<!--  <div class="page-header">-->
+<!--    <div>-->
+<!--      <h1>Attendance</h1>-->
+<!--      <p>{{ auth.isAdmin() ? 'Track and manage all employee attendance' : 'Mark and view your attendance' }}</p>-->
+<!--    </div>-->
+<!--  </div>-->
+
+<!--  &lt;!&ndash; ── EMPLOYEE PUNCH CARD ─────────────────────────────── &ndash;&gt;-->
+<!--  @if (!auth.isAdmin()) {-->
+<!--    <div class="punch-card">-->
+<!--      <div class="punch-clock">-->
+<!--        <div class="time">{{ currentTime | date:'hh:mm:ss a' }}</div>-->
+<!--        <div class="date">{{ today | date:'EEEE, dd MMMM yyyy' }}</div>-->
+<!--      </div>-->
+
+<!--      <div class="punch-divider"></div>-->
+
+<!--      <div class="punch-status">-->
+<!--        @if (myStatus) {-->
+<!--          <div class="status-row">-->
+<!--            <div class="status-item">-->
+<!--              <span>Status</span>-->
+<!--              <p-tag [value]="myStatus.status || '—'" [severity]="getSeverity(myStatus.status)"></p-tag>-->
+<!--            </div>-->
+<!--            <div class="status-item">-->
+<!--              <span>Punch In</span>-->
+<!--              <strong>{{ myStatus.punchInTime || '—' }}</strong>-->
+<!--            </div>-->
+<!--            <div class="status-item">-->
+<!--              <span>Punch Out</span>-->
+<!--              <strong>{{ myStatus.punchOutTime || '—' }}</strong>-->
+<!--            </div>-->
+<!--            <div class="status-item">-->
+<!--              <span>Overtime</span>-->
+<!--              <strong class="ot">{{ getOT(myStatus.overtimeMinutes) }}</strong>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        } @else {-->
+<!--          <p class="no-record">Aaj koi record nathi — punch in karo!</p>-->
+<!--        }-->
+
+<!--        <div class="punch-btns">-->
+<!--          <button pButton label="Punch In" icon="pi pi-sign-in" severity="success"-->
+<!--                  (click)="punchIn()" [loading]="punchLoading" [disabled]="!canPunchIn"></button>-->
+<!--          <button pButton label="Punch Out" icon="pi pi-sign-out" severity="danger"-->
+<!--                  (click)="punchOut()" [loading]="punchLoading" [disabled]="!canPunchOut"></button>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  }-->
+
+<!--  &lt;!&ndash; ── ADMIN: TODAY TABLE ──────────────────────────────── &ndash;&gt;-->
+<!--  @if (auth.isAdmin()) {-->
+<!--    <div class="section-card">-->
+<!--      <div class="card-header">-->
+<!--        <h3><i class="pi pi-users"></i> Today's Attendance</h3>-->
+<!--        <button pButton label="Refresh" icon="pi pi-refresh" severity="secondary"-->
+<!--                size="small" (click)="loadAllToday()"></button>-->
+<!--      </div>-->
+<!--      <p-table [value]="allToday" [loading]="loading"-->
+<!--               styleClass="p-datatable-sm p-datatable-striped"-->
+<!--               [paginator]="true" [rows]="10">-->
+<!--        <ng-template pTemplate="header">-->
+<!--          <tr>-->
+<!--            <th>#</th><th>Employee</th><th>Punch In</th>-->
+<!--            <th>Punch Out</th><th>Status</th><th>Overtime</th>-->
+<!--          </tr>-->
+<!--        </ng-template>-->
+<!--        <ng-template pTemplate="body" let-row let-i="rowIndex">-->
+<!--          <tr>-->
+<!--            <td>{{ i+1 }}</td>-->
+<!--            <td><strong>{{ row.employeeName }}</strong></td>-->
+<!--            <td>{{ row.punchInTime || '—' }}</td>-->
+<!--            <td>{{ row.punchOutTime || '—' }}</td>-->
+<!--            <td><p-tag [value]="row.status" [severity]="getSeverity(row.status)"></p-tag></td>-->
+<!--            <td>{{ getOT(row.overtimeMinutes) }}</td>-->
+<!--          </tr>-->
+<!--        </ng-template>-->
+<!--        <ng-template pTemplate="emptymessage">-->
+<!--          <tr><td colspan="6" class="empty-cell">Aaj koi attendance nathi</td></tr>-->
+<!--        </ng-template>-->
+<!--      </p-table>-->
+<!--    </div>-->
+
+<!--    &lt;!&ndash; ── MONTHLY REPORT ──────────────────────────────────── &ndash;&gt;-->
+<!--    <div class="section-card" style="margin-top: 1.5rem;">-->
+<!--      <div class="card-header">-->
+<!--        <h3><i class="pi pi-chart-bar"></i> Monthly Report</h3>-->
+<!--        <div class="filter-row">-->
+<!--          <input type="number" [(ngModel)]="filterEmpId" placeholder="Employee ID" class="filter-input" />-->
+<!--          <input type="month" [(ngModel)]="filterMonth" class="filter-input" />-->
+<!--          <button pButton label="Load" icon="pi pi-search" size="small" (click)="loadMonthly()"></button>-->
+
+<!--          &lt;!&ndash; ✅ ADD ATTENDANCE BUTTON — Admin only &ndash;&gt;-->
+<!--          <button pButton label="+ Add Attendance" icon="pi pi-plus"-->
+<!--                  severity="success" size="small" (click)="openAddDialog()"></button>-->
+<!--        </div>-->
+<!--      </div>-->
+
+<!--      @if (monthlyRecords.length > 0) {-->
+<!--        <p-table [value]="monthlyRecords" styleClass="p-datatable-sm" [paginator]="true" [rows]="15">-->
+<!--          <ng-template pTemplate="header">-->
+<!--            <tr>-->
+<!--              <th>Date</th><th>Day</th><th>Punch In</th>-->
+<!--              <th>Punch Out</th><th>Status</th><th>Overtime</th>-->
+<!--            </tr>-->
+<!--          </ng-template>-->
+<!--          <ng-template pTemplate="body" let-row>-->
+<!--            <tr>-->
+<!--              <td>{{ row.date | date:'dd MMM yyyy' }}</td>-->
+<!--              <td>{{ row.date | date:'EEE' }}</td>-->
+<!--              <td>{{ row.punchInTime || '—' }}</td>-->
+<!--              <td>{{ row.punchOutTime || '—' }}</td>-->
+<!--              <td><p-tag [value]="row.status" [severity]="getSeverity(row.status)"></p-tag></td>-->
+<!--              <td>{{ getOT(row.overtimeMinutes) }}</td>-->
+<!--            </tr>-->
+<!--          </ng-template>-->
+<!--        </p-table>-->
+<!--      } @else {-->
+<!--        <div class="empty-cell" style="text-align:center; padding: 2rem; color: #888;">-->
+<!--          <i class="pi pi-calendar" style="font-size:2rem"></i>-->
+<!--          <p>Employee ID ane Month select karo → Load karo</p>-->
+<!--        </div>-->
+<!--      }-->
+<!--    </div>-->
+<!--  }-->
+
+<!--</div>-->
+
+<!--&lt;!&ndash; ✅ ADD ATTENDANCE DIALOG ──────────────────────────────── &ndash;&gt;-->
+<!--<p-dialog-->
+<!--  header="➕ Add Attendance"-->
+<!--  [(visible)]="showAddDialog"-->
+<!--  [modal]="true"-->
+<!--  [closable]="true"-->
+<!--  [style]="{ width: '440px' }">-->
+
+<!--  <div style="display: flex; flex-direction: column; gap: 1rem; padding: 0.5rem 0;">-->
+
+<!--    <div style="display: flex; flex-direction: column; gap: 0.3rem;">-->
+<!--      <label><strong>Employee ID *</strong></label>-->
+<!--      <input pInputText type="number" [(ngModel)]="addForm.employeeId"-->
+<!--             placeholder="e.g. 1, 2, 3..." style="width:100%" />-->
+<!--    </div>-->
+
+<!--    <div style="display: flex; flex-direction: column; gap: 0.3rem;">-->
+<!--      <label><strong>Date *</strong></label>-->
+<!--      <p-calendar [(ngModel)]="addForm.date"-->
+<!--                  dateFormat="dd/mm/yy"-->
+<!--                  [showIcon]="true"-->
+<!--                  styleClass="w-full" />-->
+<!--    </div>-->
+
+<!--    <div style="display: flex; gap: 1rem;">-->
+<!--      <div style="flex:1; display: flex; flex-direction: column; gap: 0.3rem;">-->
+<!--        <label><strong>Punch In</strong></label>-->
+<!--        <p-calendar [(ngModel)]="addForm.punchIn"-->
+<!--                    [timeOnly]="true"-->
+<!--                    [showIcon]="true"-->
+<!--                    styleClass="w-full" />-->
+<!--      </div>-->
+<!--      <div style="flex:1; display: flex; flex-direction: column; gap: 0.3rem;">-->
+<!--        <label><strong>Punch Out</strong></label>-->
+<!--        <p-calendar [(ngModel)]="addForm.punchOut"-->
+<!--                    [timeOnly]="true"-->
+<!--                    [showIcon]="true"-->
+<!--                    styleClass="w-full" />-->
+<!--      </div>-->
+<!--    </div>-->
+
+<!--    <div style="display: flex; flex-direction: column; gap: 0.3rem;">-->
+<!--      <label><strong>Status *</strong></label>-->
+<!--      <p-dropdown-->
+<!--        [(ngModel)]="addForm.status"-->
+<!--        [options]="statusOptions"-->
+<!--        optionLabel="label"-->
+<!--        optionValue="value"-->
+<!--        styleClass="w-full" />-->
+<!--    </div>-->
+
+<!--  </div>-->
+
+<!--  <ng-template pTemplate="footer">-->
+<!--    <button pButton label="Cancel" severity="secondary"-->
+<!--            (click)="showAddDialog = false"></button>-->
+<!--    <button pButton label="Save" severity="success"-->
+<!--            icon="pi pi-check" [loading]="addLoading"-->
+<!--            (click)="submitAddAttendance()"></button>-->
+<!--  </ng-template>-->
+
+<!--</p-dialog>-->
+
+
 <p-toast></p-toast>
 
 <div class="attendance">
@@ -5,7 +327,7 @@
   <div class="page-header">
     <div>
       <h1>Attendance</h1>
-      <p>{{ auth.isAdmin() ? 'Track all employee attendance' : 'Mark and view your attendance' }}</p>
+      <p>{{ auth.isAdmin() ? 'Track and manage all employee attendance' : 'Mark and view your attendance' }}</p>
     </div>
   </div>
 
@@ -61,18 +383,23 @@
         <button pButton label="Refresh" icon="pi pi-refresh" severity="secondary"
                 size="small" (click)="loadAllToday()"></button>
       </div>
+
       <p-table [value]="allToday" [loading]="loading"
                styleClass="p-datatable-sm p-datatable-striped"
                [paginator]="true" [rows]="10">
         <ng-template pTemplate="header">
           <tr>
-            <th>#</th><th>Employee</th><th>Punch In</th>
-            <th>Punch Out</th><th>Status</th><th>Overtime</th>
+            <th>#</th>
+            <th>Employee</th>
+            <th>Punch In</th>
+            <th>Punch Out</th>
+            <th>Status</th>
+            <th>Overtime</th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-row let-i="rowIndex">
           <tr>
-            <td>{{ i+1 }}</td>
+            <td>{{ i + 1 }}</td>
             <td><strong>{{ row.employeeName }}</strong></td>
             <td>{{ row.punchInTime || '—' }}</td>
             <td>{{ row.punchOutTime || '—' }}</td>
@@ -81,42 +408,134 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
-          <tr><td colspan="6" class="empty-cell">Aaj koi attendance nathi</td></tr>
+          <tr>
+            <td colspan="6" class="empty-cell">Aaj koi attendance nathi</td>
+          </tr>
         </ng-template>
       </p-table>
     </div>
 
-    <!-- Monthly Report -->
+    <!-- ── MONTHLY REPORT ──────────────────────────────────── -->
     <div class="section-card" style="margin-top: 1.5rem;">
       <div class="card-header">
         <h3><i class="pi pi-chart-bar"></i> Monthly Report</h3>
         <div class="filter-row">
-          <input type="number" [(ngModel)]="filterEmpId" placeholder="Employee ID" class="filter-input" />
+          <input type="number" [(ngModel)]="filterEmpId"
+                 placeholder="Employee ID" class="filter-input" />
           <input type="month" [(ngModel)]="filterMonth" class="filter-input" />
-          <button pButton label="Load" icon="pi pi-search" size="small" (click)="loadMonthly()"></button>
+          <button pButton label="Load" icon="pi pi-search"
+                  size="small" (click)="loadMonthly()"></button>
+
+          <!-- ✅ Add Attendance Button -->
+          <button pButton label="+ Add Attendance" icon="pi pi-plus"
+                  severity="success" size="small"
+                  (click)="openAddDialog()"></button>
         </div>
       </div>
+
       @if (monthlyRecords.length > 0) {
-        <p-table [value]="monthlyRecords" styleClass="p-datatable-sm" [paginator]="true" [rows]="15">
+        <p-table [value]="monthlyRecords" styleClass="p-datatable-sm"
+                 [paginator]="true" [rows]="15">
           <ng-template pTemplate="header">
             <tr>
-              <th>Date</th><th>Day</th><th>Punch In</th>
-              <th>Punch Out</th><th>Status</th><th>Overtime</th>
+              <th>Date</th>
+              <th>Day</th>
+              <th>Punch In</th>
+              <th>Punch Out</th>
+              <th>Status</th>
+              <th>Overtime</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-row>
             <tr>
               <td>{{ row.date | date:'dd MMM yyyy' }}</td>
               <td>{{ row.date | date:'EEE' }}</td>
-              <td>{{ row.punchInTime || '—' }}</td>
-              <td>{{ row.punchOutTime || '—' }}</td>
+              <td>{{ row.punchInTime ? (row.punchInTime | slice:0:5) : '—' }}</td>   <!-- ✅ HH:mm -->
+              <td>{{ row.punchOutTime ? (row.punchOutTime | slice:0:5) : '—' }}</td>
               <td><p-tag [value]="row.status" [severity]="getSeverity(row.status)"></p-tag></td>
               <td>{{ getOT(row.overtimeMinutes) }}</td>
             </tr>
           </ng-template>
         </p-table>
+      } @else {
+        <div class="empty-monthly">
+          <i class="pi pi-calendar"></i>
+          <p>Employee ID ane Month select karo → Load karo</p>
+        </div>
       }
     </div>
   }
 
 </div>
+
+<!-- ✅ ADD ATTENDANCE DIALOG ──────────────────────────────── -->
+<p-dialog
+  header="➕ Add Attendance"
+  [(visible)]="showAddDialog"
+  [modal]="true"
+  [closable]="true"
+  [style]="{ width: '460px' }">
+
+  <div class="dialog-form">
+
+    <!-- Employee ID -->
+    <div class="form-field">
+      <label>Employee ID *</label>
+      <input pInputText type="number"
+             [(ngModel)]="addForm.employeeId"
+             placeholder="e.g. 1, 2, 3..."
+             class="w-full" />
+    </div>
+
+    <!-- Date -->
+    <div class="form-field">
+      <label>Date *</label>
+      <p-datepicker
+        [(ngModel)]="addForm.date"
+        dateFormat="dd/mm/yy"
+        [showIcon]="true"
+        styleClass="w-full" />
+    </div>
+
+    <!-- Punch In & Out -->
+    <div class="form-row">
+      <div class="form-field">
+        <label>Punch In Time</label>
+        <p-datepicker
+          [(ngModel)]="addForm.punchIn"
+          [timeOnly]="true"
+          [showIcon]="true"
+          styleClass="w-full" />
+      </div>
+      <div class="form-field">
+        <label>Punch Out Time</label>
+        <p-datepicker
+          [(ngModel)]="addForm.punchOut"
+          [timeOnly]="true"
+          [showIcon]="true"
+          styleClass="w-full" />
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="form-field">
+      <label>Status *</label>
+      <p-select
+        [(ngModel)]="addForm.status"
+        [options]="statusOptions"
+        optionLabel="label"
+        optionValue="value"
+        styleClass="w-full" />
+    </div>
+
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton label="Cancel" severity="secondary"
+            (click)="showAddDialog = false"></button>
+    <button pButton label="Save" severity="success"
+            icon="pi pi-check" [loading]="addLoading"
+            (click)="submitAddAttendance()"></button>
+  </ng-template>
+
+</p-dialog>
